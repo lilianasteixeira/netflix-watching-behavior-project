@@ -1,0 +1,111 @@
+version: 2
+
+models:
+
+  - name: stg_movies
+    description: "Cleaned content catalogue — byte strings decoded, types cast"
+    columns:
+      - name: movie_id
+        tests: [not_null]
+      - name: title
+        tests: [not_null]
+      - name: content_type
+        tests:
+          - accepted_values:
+              values: ['Movie', 'TV Series', 'Documentary', 'Limited Series', 'Stand-up Comedy']
+      - name: genre_primary
+        tests: [not_null]
+      - name: age_rating
+        tests:
+          - accepted_values:
+              values: ['G', 'PG', 'PG-13', 'R', 'NC-17', 'TV-G', 'TV-PG', 'TV-14', 'TV-MA', 'TV-Y', 'TV-Y7']
+      - name: release_year
+        tests: [not_null]
+
+  - name: stg_users
+    description: "Cleaned user dimension — PII dropped, age/plan buckets added"
+    columns:
+      - name: user_id
+        tests: [not_null]
+      - name: country
+        tests:
+          - accepted_values:
+              values: ['USA', 'Canada']
+      - name: subscription_plan
+        tests:
+          - accepted_values:
+              values: ['Basic', 'Standard', 'Premium', 'Premium+']
+      - name: is_active
+        tests: [not_null]
+
+  - name: stg_watch_history
+    description: "Core fact view — sessions with completion flag and duration bucket"
+    columns:
+      - name: session_id
+        tests: [not_null]
+      - name: user_id
+        tests: [not_null]
+      - name: movie_id
+        tests: [not_null]
+      - name: watch_date
+        tests: [not_null]
+      - name: action
+        tests:
+          - accepted_values:
+              values: ['started', 'paused', 'stopped', 'completed']
+      - name: quality
+        tests:
+          - accepted_values:
+              values: ['SD', 'HD', '4K', 'Ultra HD']
+
+  - name: stg_reviews
+    description: "User reviews with sentiment — helpfulness ratio derived"
+    columns:
+      - name: review_id
+        tests: [not_null]
+      - name: user_id
+        tests: [not_null]
+      - name: movie_id
+        tests: [not_null]
+      - name: rating
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5]
+              quote: false
+      - name: sentiment
+        tests:
+          - accepted_values:
+              values: ['positive', 'neutral', 'negative']
+
+  - name: stg_recommendation_logs
+    description: "Recommendation events — CTR signal via was_clicked"
+    columns:
+      - name: recommendation_id
+        tests: [not_null]
+      - name: user_id
+        tests: [not_null]
+      - name: movie_id
+        tests: [not_null]
+      - name: recommendation_type
+        tests:
+          - accepted_values:
+              values: ['personalized', 'genre_based', 'trending', 'similar_users', 'new_releases']
+      - name: time_of_day
+        tests:
+          - accepted_values:
+              values: ['morning', 'afternoon', 'evening', 'night']
+
+  - name: stg_search_logs
+    description: "Search events — click-through outcome and zero-result detection"
+    columns:
+      - name: search_id
+        tests: [not_null]
+      - name: user_id
+        tests: [not_null]
+      - name: search_query
+        tests: [not_null]
+      - name: search_outcome
+        tests:
+          - accepted_values:
+              values: ['zero_results', 'no_click', 'top_3_click', 'lower_click']

@@ -1,0 +1,25 @@
+# ── Airflow providers ──────────────────────────────────────────────────────────
+apache-airflow-providers-google>=10.0.0
+
+# ── GCP clients ───────────────────────────────────────────────────────────────
+google-cloud-bigquery>=3.11.0
+google-cloud-storage>=2.10.0
+
+# ── dbt ───────────────────────────────────────────────────────────────────────
+dbt-bigquery>=1.7.0
+
+# ── Data / serialisation ──────────────────────────────────────────────────────
+pandas>=2.0.0
+pyarrow>=14.0.0
+
+# ── Croissant ingestion (existing DAG dependency) ──────────────────────────────
+mlcroissant>=0.0.14
+
+# ── Streamlit dashboard ───────────────────────────────────────────────────────
+streamlit>=1.30.0
+
+# ── HTTP calls (for DAG trigger) ──────────────────────────────────────────────
+requests>=2.31.0
+
+# ── Optional: better charts ───────────────────────────────────────────────────
+plotly>=5.18.0

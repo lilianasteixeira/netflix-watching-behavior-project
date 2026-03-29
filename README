@@ -1,0 +1,12 @@
+## Instructions:
+
+- First take a look on architecture image or [file](./architecture.excalidraw);
+- Next, configure infra. For that follow [terraform instructions](./infra/terraform/README.md) and next build [docker image](./docker-compose-airflow.yml), the simple way is right click on the file and select `Compose Up` option or `docker compose -f 'docker-compose-airflow.yml' up -d --build`; 
+**Note**: Check on docker if all the service initiate correctly, if not make a compose down and up again.
+- After configure infra, go to [Airflow UI](http://localhost:9000). The user and password are configured on [docker image](./docker-compose-airflow.yml) on `airflow-init`;
+- Inside [Airflow UI](http://localhost:9000), you will see all dags available, the correct order to run them:
+    1. **kaggle_netflix_to_gcs**: this dag reads all datasets available from [kaggle netflix](https://www.kaggle.com/datasets/sayeeduddin/netflix-2025user-behavior-dataset-210k-records/);
+    2. **netflix_gcs_to_bq_dbt**: Perform all tranformations using dbt models, creating the layers raw (Bronze), curated (Silver) and marts (Gold) and saving them on BigQuery;
+    3. **streamlit_dashboard_refresh**: used to build and refresh dashbord using netflix_marts data;
+    **Note**: the `inspect_gcs_parquet_schema` dag only exists if you need to chech the schemas, you don't need to trigger this one.
+- Finally to see the dashboard open [Streamlit app](http://localhost:8501/);

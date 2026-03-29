@@ -1,0 +1,24 @@
+name: 'netflix_analytics'
+version: '1.0.0'
+config-version: 2
+
+profile: netflix_analytics
+
+model-paths: ["models"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+models:
+  netflix_analytics:
+    staging:
+      +materialized: view
+      +dataset: "{{ env_var('BQ_DATASET_CURATED', 'netflix_curated') }}"
+    intermediate:
+      +materialized: view
+      +dataset: "{{ env_var('BQ_DATASET_CURATED', 'netflix_curated') }}"
+    marts:
+      +materialized: table
+      +dataset: "{{ env_var('BQ_DATASET_MARTS', 'netflix_marts') }}"

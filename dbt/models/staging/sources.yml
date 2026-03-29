@@ -1,0 +1,184 @@
+version: 2
+
+sources:
+  - name: netflix_raw
+    database: "{{ env_var('GCP_PROJECT_ID', 'netflix-user-behavior-490622') }}"
+    schema: "{{ env_var('BQ_DATASET_RAW', 'netflix_raw') }}"
+    description: "Raw tables loaded from GCS Parquet files by the kaggle_netflix_to_gcs DAG."
+
+    tables:
+
+      - name: movies
+        description: >
+          Content catalogue — 1,040 movies, TV series, documentaries, limited series
+          and stand-up specials. One row per title. String columns are stored as bytes
+          (b'...') in Parquet; staging casts them to plain STRING.
+        columns:
+          - name: movie_id
+            description: "Surrogate key — e.g. movie_0001"
+            tests: [not_null]
+          - name: title
+            tests: [not_null]
+          - name: content_type
+            description: "Movie | TV Series | Documentary | Limited Series | Stand-up Comedy"
+          - name: genre_primary
+          - name: genre_secondary
+            description: "Optional second genre — 64 % null"
+          - name: release_year
+            tests: [not_null]
+          - name: duration_minutes
+          - name: rating
+            description: "MPAA / TV rating: G, PG, PG-13, R, NC-17, TV-G, TV-PG, TV-14, TV-MA, TV-Y, TV-Y7"
+          - name: language
+          - name: country_of_origin
+          - name: imdb_rating
+            description: "14 % null"
+          - name: production_budget
+            description: "65 % null"
+          - name: box_office_revenue
+            description: "68 % null"
+          - name: number_of_seasons
+            description: "Null for non-series content"
+          - name: number_of_episodes
+            description: "Null for non-series content"
+          - name: is_netflix_original
+          - name: added_to_platform
+          - name: content_warning
+
+      - name: users
+        description: >
+          User dimension — 10,300 subscribers in USA and Canada.
+          PII columns (email, first_name, last_name) are present but excluded
+          from all downstream models.
+        columns:
+          - name: user_id
+            tests: [not_null]
+          - name: age
+            description: "12 % null"
+          - name: gender
+            description: "Female | Male | Other | Prefer not to say — 8 % null"
+          - name: country
+            description: "USA | Canada"
+          - name: state_province
+          - name: city
+          - name: subscription_plan
+            description: "Basic | Standard | Premium | Premium+"
+          - name: subscription_start_date
+          - name: is_active
+          - name: monthly_spend
+            description: "10 % null"
+          - name: primary_device
+            description: "Desktop | Gaming Console | Laptop | Mobile | Smart TV | Tablet"
+          - name: household_size
+            description: "1–8, 15 % null"
+          - name: created_at
+
+      - name: watch_history
+        description: >
+          Core fact table — 105,000 viewing sessions.
+          Each row is one watch event (started / paused / stopped / completed).
+          user_rating is 80 % null (users rarely rate inline).
+        columns:
+          - name: session_id
+            tests: [not_null]
+          - name: user_id
+            tests: [not_null]
+          - name: movie_id
+            tests: [not_null]
+          - name: watch_date
+            tests: [not_null]
+          - name: device_type
+            description: "Desktop | Laptop | Mobile | Smart TV | Tablet"
+          - name: watch_duration_minutes
+            description: "12 % null"
+          - name: progress_percentage
+            description: "0–100, 8 % null"
+          - name: action
+            description: "started | paused | stopped | completed"
+          - name: quality
+            description: "SD | HD | 4K | Ultra HD"
+          - name: location_country
+            description: "USA | Canada"
+          - name: is_download
+          - name: user_rating
+            description: "1–5, 80 % null"
+
+      - name: reviews
+        description: >
+          User reviews — 15,450 rows. Includes pre-computed sentiment label
+          and sentiment_score (positive / neutral / negative).
+        columns:
+          - name: review_id
+            tests: [not_null]
+          - name: user_id
+            tests: [not_null]
+          - name: movie_id
+            tests: [not_null]
+          - name: rating
+            description: "1–5 integer"
+            tests: [not_null]
+          - name: review_date
+            tests: [not_null]
+          - name: device_type
+          - name: is_verified_watch
+          - name: helpful_votes
+            description: "0–13, 12 % null"
+          - name: total_votes
+            description: "0–16, 12 % null"
+          - name: review_text
+            description: "5 % null"
+          - name: sentiment
+            description: "positive | neutral | negative"
+          - name: sentiment_score
+            description: "0–1 float, 8 % null"
+
+      - name: recommendation_logs
+        description: >
+          Recommendation engine events — 52,000 rows.
+          Records what was recommended, its position, whether it was clicked,
+          and which algorithm version served it.
+        columns:
+          - name: recommendation_id
+            tests: [not_null]
+          - name: user_id
+            tests: [not_null]
+          - name: movie_id
+            tests: [not_null]
+          - name: recommendation_date
+            tests: [not_null]
+          - name: recommendation_type
+            description: "personalized | genre_based | trending | similar_users | new_releases"
+          - name: recommendation_score
+            description: "0–1 float, 10 % null"
+          - name: was_clicked
+          - name: position_in_list
+            description: "1–20"
+          - name: device_type
+          - name: time_of_day
+            description: "morning | afternoon | evening | night"
+          - name: algorithm_version
+            description: "v1.2 | v1.3 | v1.4 | v2.0 — 5 % null"
+
+      - name: search_logs
+        description: >
+          Search events — 26,500 rows.
+          clicked_result_position is null when no result was clicked (51 % of searches).
+        columns:
+          - name: search_id
+            tests: [not_null]
+          - name: user_id
+            tests: [not_null]
+          - name: search_query
+            tests: [not_null]
+          - name: search_date
+            tests: [not_null]
+          - name: results_returned
+          - name: clicked_result_position
+            description: "1–10, null = no click (51 % null)"
+          - name: device_type
+          - name: search_duration_seconds
+            description: "5 % null"
+          - name: had_typo
+          - name: used_filters
+          - name: location_country
+            description: "USA | Canada"

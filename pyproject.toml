@@ -1,0 +1,27 @@
+[project]
+name = "netflix-watching-behavior-project"
+version = "0.1.0"
+description = "DE Zoomcamp capstone: Netflix behavior data — GCS lake, BigQuery warehouse, Spark transforms, Airflow orchestration."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "google-cloud-bigquery==3.27.0",
+  "google-cloud-storage==2.18.2",
+  "pandas==2.2.3",
+  "pyarrow==17.0.0",
+  "python-dotenv==1.0.1",
+  "pyspark==3.5.3",
+]
+
+[project.scripts]
+netflix-download-http = "netflix_pipeline.jobs.download_http:main"
+netflix-ingest = "netflix_pipeline.jobs.ingest_to_gcs:main"
+netflix-transform = "netflix_pipeline.jobs.transform_to_bq:main"
+
+[tool.uv]
+dev-dependencies = [
+  "ruff==0.8.1",
+]
+
+[tool.ruff]
+line-length = 100
