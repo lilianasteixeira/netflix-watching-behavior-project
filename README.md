@@ -63,3 +63,15 @@ The infrastructure is fully managed as code using:
     3. **streamlit_dashboard_refresh**: used to build and refresh dashbord using netflix_marts data;
     **Note**: the `inspect_gcs_parquet_schema` dag only exists if you need to chech the schemas, you don't need to trigger this one.
 - Finally to see the dashboard open [Streamlit app](http://localhost:8501/);
+---
+## Dashboard
+
+You can find the exported dashboard (PDF format) in the [`assets/`](./assets/) folder.
+
+### Dashboard Sections
+
+- [User Activity.pdf](./assets/main_page.pdf)
+
+- [Content.pdf](./assets/content_page.pdf)
+
+- [Genres.pdf](./assets/genres.pdf)
