@@ -5,7 +5,7 @@ netflix_analytics:
       type: bigquery
       method: service-account
       project: "{{ env_var('GCP_PROJECT_ID', 'netflix-user-behavior-490622') }}"
-      dataset: "{{ env_var('BQ_DATASET_CURATED', 'netflix_curated') }}"
+      dataset: "{{ env_var('BQ_DATASET_RAW', 'netflix_raw') }}"
       keyfile: /opt/keys/gcp-sa.json
       location: europe-west1
       threads: 4

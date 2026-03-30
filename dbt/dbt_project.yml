@@ -15,10 +15,10 @@ models:
   netflix_analytics:
     staging:
       +materialized: view
-      +dataset: "{{ env_var('BQ_DATASET_CURATED', 'netflix_curated') }}"
+      +schema: "{{ env_var('BQ_DATASET_CURATED', 'netflix_curated') }}"
     intermediate:
       +materialized: view
-      +dataset: "{{ env_var('BQ_DATASET_CURATED', 'netflix_curated') }}"
+      +schema: "{{ env_var('BQ_DATASET_CURATED', 'netflix_curated') }}"
     marts:
       +materialized: table
-      +dataset: "{{ env_var('BQ_DATASET_MARTS', 'netflix_marts') }}"
+      +schema: "{{ env_var('BQ_DATASET_MARTS', 'netflix_marts') }}"
